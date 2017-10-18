@@ -4,7 +4,6 @@ Management command for trampoline.
 from __future__ import print_function
 from concurrent.futures import as_completed
 from concurrent.futures import ThreadPoolExecutor
-from optparse import make_option
 import logging
 import sys
 
@@ -32,23 +31,40 @@ class Command(ESBaseCommand):
 
     MAX_THREADS_DEFAULT = 4
 
-    option_list = ESBaseCommand.option_list + (
-        ESBaseCommand.options['index_name'],
-        ESBaseCommand.options['target_name'],
-        make_option(
+    def add_arguments(self, parser):
+
+        parser.add_argument(**ESBaseCommand.options['index_name'])
+        parser.add_argument(**ESBaseCommand.options['target_name'])
+        parser.add_argument(
             '--threads',
             dest='max_threads',
-            default=MAX_THREADS_DEFAULT,
+            default=self.MAX_THREADS_DEFAULT,
             help="Number of threads."
-        ),
-        make_option(
+        )
+        parser.add_argument(
             '--cleanup',
             dest='cleanup',
             action='store_true',
             default=False,
             help="Delete stale documents."
-        ),
-    )
+        )
+        parser.add_argument(
+            '--dry-run',
+            action='store_true',
+            dest='dry_run',
+            default=False,
+            help=(
+                "Run the command in dry run mode without actually changing "
+                "anything."
+            )
+        )
+        parser.add_argument(
+            '--yes',
+            action='store_true',
+            dest='yes',
+            default=False,
+            help="Bypass the command line's verification.")
+
     required_options = ('index_name',)
 
     def run(self, *args, **options):

@@ -2,7 +2,6 @@
 Base management command for trampoline.
 """
 from __future__ import print_function
-from optparse import make_option
 import sys
 import traceback
 
@@ -17,31 +16,30 @@ class ESBaseCommand(BaseCommand):
     required_options = []
 
     options = {
-        'index_name': make_option(
-            '--index',
-            '-i',
+        'index_name': dict(
+            option_strings=['--index', '-i'],
+            nargs='?',
             dest='index_name',
             default=None,
             help="Name of the index."
         ),
-        'target_name': make_option(
-            '--target',
-            '-t',
+        'target_name': dict(
+            option_strings=['--target', '-t'],
+            nargs='?',
             dest='target_name',
             default=None,
             help="Name of the target index."
         ),
-        'using': make_option(
-            '--using',
-            '-u',
+        'using': dict(
+            option_strings=['--using', '-u'],
             dest='using',
             default='default',
             help="Connection name."
         ),
     }
 
-    option_list = BaseCommand.option_list + (
-        make_option(
+    def add_arguments(self, parser):
+        parser.add_argument(
             '--dry-run',
             action='store_true',
             dest='dry_run',
@@ -50,15 +48,14 @@ class ESBaseCommand(BaseCommand):
                 "Run the command in dry run mode without actually changing "
                 "anything."
             )
-        ),
-        make_option(
+        )
+
+        parser.add_argument(
             '--yes',
             action='store_true',
             dest='yes',
             default=False,
-            help="Bypass the command line's verification."
-        ),
-    )
+            help="Bypass the command line's verification.")
 
     def handle(self, *args, **options):
         self.trampoline_config = get_trampoline_config()
